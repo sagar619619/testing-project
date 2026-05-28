@@ -26,6 +26,45 @@
       <div class="page">
         <img src="assets/images/6.jpg" alt="" />
       </div>
+      <div class="page">
+        <img src="assets/images/7.jpg" alt="" />
+      </div>
+      <div class="page">
+        <img src="assets/images/8.jpg" alt="" />
+      </div>
+      <div class="page">
+        <img src="assets/images/9.jpg" alt="" />
+      </div>
+      <div class="page">
+        <img src="assets/images/10.jpg" alt="" />
+      </div>
+      <div class="page">
+        <img src="assets/images/11.jpg" alt="" />
+      </div>
+      <div class="page">
+        <img src="assets/images/12.jpg" alt="" />
+      </div>
+      <div class="page">
+        <img src="assets/images/13.jpg" alt="" />
+      </div>
+      <div class="page">
+        <img src="assets/images/14.jpg" alt="" />
+      </div>
+      <div class="page">
+        <img src="assets/images/15.jpg" alt="" />
+      </div>
+      <div class="page">
+        <img src="assets/images/16.jpg" alt="" />
+      </div>
+      <div class="page">
+        <img src="assets/images/17.jpg" alt="" />
+      </div>
+      <div class="page">
+        <img src="assets/images/18.jpg" alt="" />
+      </div>
+      <div class="page">
+        <img src="assets/images/19.jpg" alt="" />
+      </div>
     </div>
   </div>
 
@@ -42,10 +81,25 @@
     <button id="zoomOut">-</button>
     <button id="downloadSingleImg">Download Image</button>
     <button id="downloadPdf">Download PDF</button>
+    <button id="shareBook">Share</button>
   </div>
 
   <div class="popup-content">
     <img id="popupImg" src="" alt="" />
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div id="shareModal" class="share-modal">
+  <div class="share-box">
+    <h3>Share This Book</h3>
+
+    <a id="whatsappShare" target="_blank">WhatsApp</a>
+    <a id="facebookShare" target="_blank">Facebook</a>
+    <a id="telegramShare" target="_blank">Telegram</a>
+
+    <button id="copyLink">Copy Link</button>
+    <button id="closeShare">Close</button>
   </div>
 </div>
 
@@ -2040,39 +2094,73 @@
   /* =========================
    IMAGE CLICK POPUP OPEN
 ========================= */
-  $(".book .page img").click(function () {
+  // $(".book .page img").click(function () {
+  //   let imgSrc = $(this).attr("src");
+
+  //   $("#popupImg").attr("src", imgSrc);
+
+  //   // ✅ SINGLE IMAGE DOWNLOAD FIX
+  //   $("#downloadSingleImg")
+  //     .off("click")
+  //     .on("click", function () {
+  //       fetch(imgSrc)
+  //         .then((res) => res.blob())
+  //         .then((blob) => {
+  //           let url = window.URL.createObjectURL(blob);
+
+  //           let a = document.createElement("a");
+  //           a.href = url;
+  //           a.download = imgSrc.split("/").pop() || "image.jpg";
+
+  //           document.body.appendChild(a);
+  //           a.click();
+  //           a.remove();
+
+  //           window.URL.revokeObjectURL(url);
+  //         });
+  //     });
+
+  //   $("#imagePopup").css("display", "block");
+
+  //   // hide next/prev
+  //   $("#prevPage, #nextPage").hide();
+
+  //   scale = 1;
+  //   $("#popupImg").css("transform", "scale(1)");
+  // });
+
+  /* =========================
+   IMAGE CLICK POPUP OPEN
+========================= */
+
+  $(document).on("click", ".book .page img", function () {
     let imgSrc = $(this).attr("src");
 
     $("#popupImg").attr("src", imgSrc);
 
-    // ✅ SINGLE IMAGE DOWNLOAD FIX
+    $("#imagePopup").fadeIn();
+    // HIDE BUTTONS
+    $("#prevPage, #nextPage").hide();
+    scale = 1;
+
+    $("#popupImg").css("transform", "scale(1)");
+
+    // DOWNLOAD SINGLE IMAGE
     $("#downloadSingleImg")
       .off("click")
       .on("click", function () {
         fetch(imgSrc)
           .then((res) => res.blob())
           .then((blob) => {
-            let url = window.URL.createObjectURL(blob);
+            let link = document.createElement("a");
 
-            let a = document.createElement("a");
-            a.href = url;
-            a.download = imgSrc.split("/").pop() || "image.jpg";
+            link.href = URL.createObjectURL(blob);
 
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
+            link.download = "image.jpg";
 
-            window.URL.revokeObjectURL(url);
+            link.click();
           });
       });
-
-    $("#imagePopup").css("display", "block");
-
-    // hide next/prev
-    $("#prevPage, #nextPage").hide();
-
-    scale = 1;
-    $("#popupImg").css("transform", "scale(1)");
   });
 
   /* =========================
@@ -2142,63 +2230,112 @@
   /* =========================
    PDF DOWNLOAD (FULL BOOK)
 ========================= */
-  $("#downloadPdf").click(function () {
+  $("#downloadPdf").click(async function () {
+    const { jsPDF } = window.jspdf;
 
-  const { jsPDF } = window.jspdf;
-  let pdf = new jsPDF("p", "mm", "a4");
+    const pdf = new jsPDF("p", "mm", "a4");
 
-  let images = $(".book .page img");
-  let loaded = 0;
-  let imgArray = [];
+    // ALL IMAGE PATHS
+    const imagePaths = [
+      "assets/images/1.jpg",
+      "assets/images/2.jpg",
+      "assets/images/3.jpg",
+      "assets/images/4.jpg",
+      "assets/images/5.jpg",
+      "assets/images/6.jpg",
+      "assets/images/7.jpg",
+      "assets/images/8.jpg",
+      "assets/images/9.jpg",
+      "assets/images/10.jpg",
+      "assets/images/11.jpg",
+      "assets/images/12.jpg",
+      "assets/images/13.jpg",
+      "assets/images/14.jpg",
+      "assets/images/15.jpg",
+      "assets/images/16.jpg",
+      "assets/images/17.jpg",
+      "assets/images/18.jpg",
+      "assets/images/19.jpg",
+    ];
 
-  if (images.length === 0) {
-    alert("No images found!");
-    return;
-  }
+    for (let i = 0; i < imagePaths.length; i++) {
+      let imgData = await getBase64Image(imagePaths[i]);
 
-  images.each(function (i) {
-
-    let img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = $(this).attr("src");
-
-    img.onload = function () {
-
-      let canvas = document.createElement("canvas");
-      let ctx = canvas.getContext("2d");
-
-      canvas.width = img.width;
-      canvas.height = img.height;
-
-      ctx.drawImage(img, 0, 0);
-
-      imgArray[i] = canvas.toDataURL("image/jpeg", 1.0);
-
-      loaded++;
-
-      if (loaded === images.length) {
-
-        imgArray.forEach(function (data, index) {
-
-          let props = pdf.getImageProperties(data);
-
-          let pdfWidth = pdf.internal.pageSize.getWidth();
-          let pdfHeight = (props.height * pdfWidth) / props.width;
-
-          if (index > 0) pdf.addPage();
-
-          pdf.addImage(data, "JPEG", 0, 0, pdfWidth, pdfHeight);
-        });
-
-        pdf.save("book.pdf");
+      if (i > 0) {
+        pdf.addPage();
       }
-    };
 
-    img.onerror = function () {
-      console.log("Image failed:", img.src);
-    };
+      pdf.addImage(imgData, "JPEG", 0, 0, 210, 297);
+    }
 
+    pdf.save("flipbook.pdf");
   });
 
-});
+  function getBase64Image(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+
+      img.crossOrigin = "Anonymous";
+
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = img.width;
+
+        canvas.height = img.height;
+
+        ctx.drawImage(img, 0, 0);
+
+        const dataURL = canvas.toDataURL("image/jpeg", 1.0);
+
+        resolve(dataURL);
+      };
+
+      img.onerror = reject;
+
+      img.src = src;
+    });
+  }
+
+  //share social media//
+  $("#shareBook").click(function () {
+    let url = encodeURIComponent(window.location.href);
+
+    // WhatsApp
+    $("#whatsappShare").attr(
+      "href",
+      "https://api.whatsapp.com/send?text=" + url,
+    );
+
+    // Facebook
+    $("#facebookShare").attr(
+      "href",
+      "https://www.facebook.com/sharer/sharer.php?u=" + url,
+    );
+
+    // Telegram
+    $("#telegramShare").attr("href", "https://t.me/share/url?url=" + url);
+
+    $("#shareModal").css("display", "flex");
+  });
+
+  // close modal
+  $("#closeShare").click(function () {
+    $("#shareModal").hide();
+  });
+
+  // outside click close
+  $("#shareModal").click(function (e) {
+    if (e.target.id === "shareModal") {
+      $("#shareModal").hide();
+    }
+  });
+
+  // copy link
+  $("#copyLink").click(function () {
+    navigator.clipboard.writeText(window.location.href);
+    alert("Link copied!");
+  });
 </script>
