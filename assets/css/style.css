@@ -114,11 +114,16 @@ body {
 
 /* IMAGE FIX */
 #popupImg {
-  transform-origin: top center;
+   transform-origin: top center;
   transition: transform 0.2s ease;
-  max-width: none;   /* important */
+
+  max-width: 90vw;   /* ✅ viewport fit */
+  max-height: 90vh;  /* ✅ screen fit */
+  width: auto;
   height: auto;
+
   cursor: grab;
+  transform: scale(1); /* ✅ default reset */
 }
 
 /* CLOSE BUTTON */

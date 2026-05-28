@@ -56,6 +56,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   /* turn.js 4.1.0 | Copyright (c) 2012 Emmanuel Garcia | turnjs.com | turnjs.com/license.txt */ (function (
     f,
@@ -2096,7 +2097,7 @@
    ZOOM IN
 ========================= */
   $("#zoomIn").click(function () {
-    scale += 0.2;
+    scale += 0.1;
     $("#popupImg").css("transform", "scale(" + scale + ")");
   });
 
@@ -2142,45 +2143,62 @@
    PDF DOWNLOAD (FULL BOOK)
 ========================= */
   $("#downloadPdf").click(function () {
-    let pdf = new jspdf.jsPDF("p", "mm", "a4");
 
-    let images = $(".book .page img");
+  const { jsPDF } = window.jspdf;
+  let pdf = new jsPDF("p", "mm", "a4");
 
-    let loaded = 0;
-    let imgArray = [];
+  let images = $(".book .page img");
+  let loaded = 0;
+  let imgArray = [];
 
-    images.each(function (i) {
-      let img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = $(this).attr("src");
+  if (images.length === 0) {
+    alert("No images found!");
+    return;
+  }
 
-      img.onload = function () {
-        let canvas = document.createElement("canvas");
-        let ctx = canvas.getContext("2d");
+  images.each(function (i) {
 
-        canvas.width = img.width;
-        canvas.height = img.height;
+    let img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = $(this).attr("src");
 
-        ctx.drawImage(img, 0, 0);
+    img.onload = function () {
 
-        imgArray[i] = canvas.toDataURL("image/jpeg");
+      let canvas = document.createElement("canvas");
+      let ctx = canvas.getContext("2d");
 
-        loaded++;
+      canvas.width = img.width;
+      canvas.height = img.height;
 
-        if (loaded === images.length) {
-          imgArray.forEach(function (data, index) {
-            let props = pdf.getImageProperties(data);
-            let pdfWidth = pdf.internal.pageSize.getWidth();
-            let pdfHeight = (props.height * pdfWidth) / props.width;
+      ctx.drawImage(img, 0, 0);
 
-            if (index > 0) pdf.addPage();
+      imgArray[i] = canvas.toDataURL("image/jpeg", 1.0);
 
-            pdf.addImage(data, "JPEG", 0, 0, pdfWidth, pdfHeight);
-          });
+      loaded++;
 
-          pdf.save("book.pdf");
-        }
-      };
-    });
+      if (loaded === images.length) {
+
+        imgArray.forEach(function (data, index) {
+
+          let props = pdf.getImageProperties(data);
+
+          let pdfWidth = pdf.internal.pageSize.getWidth();
+          let pdfHeight = (props.height * pdfWidth) / props.width;
+
+          if (index > 0) pdf.addPage();
+
+          pdf.addImage(data, "JPEG", 0, 0, pdfWidth, pdfHeight);
+        });
+
+        pdf.save("book.pdf");
+      }
+    };
+
+    img.onerror = function () {
+      console.log("Image failed:", img.src);
+    };
+
   });
+
+});
 </script>
