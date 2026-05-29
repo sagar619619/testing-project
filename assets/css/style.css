@@ -145,8 +145,10 @@ body {
 
 .popup-controls {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  /* top: 20px;
+  left: 20px; */
+  bottom: 20px;
+  left: 43%;
   display: flex;
   gap: 10px;
   z-index: 100000;
